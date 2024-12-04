@@ -14,7 +14,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-var secretKey = []byte("your-secret-key")
+var secretKey = []byte("secrete")
 
 func Login(c echo.Context) error {
 	username := c.FormValue("username")
@@ -65,20 +65,20 @@ func GenerateJwtToken(user model.User) (string, error) {
 }
 
 func GetUserByUsername(c echo.Context) error {
-	username := c.FormValue("username")
+	id := c.FormValue("id")
 
 	user := model.User{}
-	fmt.Println("Looking for user:", username)
+	fmt.Println("Looking for user:", id)
 
 	// Prepare the query to fetch the user by username
-	stmt, err := db.DB.Prepare("SELECT id, username, password, role, email, name FROM User WHERE username = ?")
+	stmt, err := db.DB.Prepare("SELECT id, username, password, role, email, name FROM User WHERE id = ?")
 	if err != nil {
 		return utils.Response(c, http.StatusOK, false, "Unexpected Error", err.Error())
 	}
 	defer stmt.Close()
 
 	// Execute the query and scan the result into the user struct
-	err = stmt.QueryRow(username).Scan(&user.ID, &user.Username, &user.Pasword, &user.Role, &user.Email, &user.Name)
+	err = stmt.QueryRow(id).Scan(&user.ID, &user.Username, &user.Pasword, &user.Role, &user.Email, &user.Name)
 	if err == sql.ErrNoRows {
 		// Return response if no user is found
 		return utils.Response(c, http.StatusOK, false, "User not found", "")
